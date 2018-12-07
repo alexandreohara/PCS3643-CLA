@@ -2,7 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://alexandreohara.github.io/my-app",
+  "homepage": "https://alexandreohara.github.io/PCS3643-CLA",
   "dependencies": {
     "faker": "^4.1.0",
     "gh-pages": "^2.0.1",
