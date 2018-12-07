@@ -1,0 +1,17 @@
+.listaPrest {
+	align-items: center;
+	margin: 20px;
+	font-weight : bold;
+	
+}	
+.Lista{
+	color: 'red';
+	width: 100%;
+}
+.LabelTeamBuilder{
+	width: 95%;
+	margin: 10px;
+}
+.pesquisa{
+	margin:20px;
+}
