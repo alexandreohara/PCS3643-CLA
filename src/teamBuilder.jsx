@@ -4,6 +4,7 @@ import _  from 'lodash'
 import logo from './logo.svg';
 import './App.css';
 import {Search,Button,Accordion,Icon,Grid,Segment,Header,Image,Label,Container,Statistic,Item} from 'semantic-ui-react'
+import Link from 'react-router-dom/Link';
 
 
 const getResults = () =>
@@ -90,7 +91,7 @@ class Equipe extends Component{
 			</div>
 			<div>
 				<Button color='red' onClick={this.props.limpar}>Limpar</Button>
-				<Button color='green'>Enviar Convites!</Button>
+				<Link to='/'><Button color='green'>Enviar Convites!</Button></Link>
 			</div>
 
 		</div>

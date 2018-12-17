@@ -1,6 +1,14 @@
 import * as React from 'react';
 import { Button, Checkbox, Form, Segment, Grid } from 'semantic-ui-react';
 import '../App.css';
+import Link from 'react-router-dom/Link';
+
+const axios = require('axios');
+
+const headers = {
+  'Content-Type': 'application/json' ,
+  'Access-Control-Allow-Origin':'*'
+}
 
 export class ServiceForm extends React.Component {
 
@@ -8,7 +16,35 @@ export class ServiceForm extends React.Component {
     super(props);
     this.state = {
       checked: false,
+      name: '',
+      project: '',
+      price: '',
+      prazo: '',
+      desc: '',
     };
+  }
+
+  // handleChange = (e) => {
+  //   const { name, project, price, prazo, desc } = this.state;
+  // }
+
+  handleChange = (e, { name, value }) => this.setState({ [name]: value })
+  handleClick = () => {
+    console.log(this.state); // aqui faz o post do projeto e coloca como demanda do cliente
+    axios.post('https://pcs3643-cla.tk/projeto', {
+      nome: this.state.project,
+      valor: this.state.price,
+      desc: this.state.desc,
+      prazo: this.state.prazo,
+      cliente: this.state.name,
+    }, { headers: headers })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
   }
 
   render() {
@@ -17,40 +53,50 @@ export class ServiceForm extends React.Component {
         <div className='bg'></div>
         <Grid columns='2' padded centered>
           <Grid.Column>
-            <Form>
+            <Form onSubmit={this.handleSubmit}>
               <Segment raised>
                 <Form.Input
-                  value={this.props.client.readOnly ? this.props.client.name : undefined}
+                  name='name'
+                  value={this.state.name}
+                  onChange={this.handleChange}
                   label='Nome do Cliente'
                   placeholder={this.props.client.name}
-                  readOnly={this.props.client.readOnly}
+                  readOnly={false}
                   required
                 />
                 <Form.Input
+                  name='project'
                   value={this.props.client.readOnly ? this.props.client.serviceTitle : undefined}
+                  onChange={this.handleChange}
                   placeholder={this.props.client.serviceTitle}
                   label='Título da Demanda'
                   readOnly={this.props.client.readOnly}
                   required
                 />
                 <Form.Input
+                  name='price'
                   value={this.props.client.readOnly ? this.props.client.price : undefined}
                   placeholder={this.props.client.price}
+                  onChange={this.handleChange}
                   label='Preço proposto pela demanda'
                   readOnly={this.props.client.readOnly}
                   required
                 />
                 <Form.Input
+                  name='prazo'
                   value={this.props.client.readOnly ? this.props.client.limitDate : undefined}
                   placeholder={this.props.client.limitDate}
+                  onChange={this.handleChange}
                   label='Prazo máximo para o fim da demanda'
                   readOnly={this.props.client.readOnly}
                   required
                 />
                 <Form.TextArea
+                  name='desc'
                   rows='5'
                   value={this.props.client.readOnly ? this.props.client.description : undefined}
                   placeholder={this.props.client.description}
+                  onChange={this.handleChange}
                   label='Descrição do serviço e condições'
                   readOnly={this.props.client.readOnly}
                   required
@@ -58,8 +104,12 @@ export class ServiceForm extends React.Component {
                 <Form.Field>
                   <Checkbox label='Eu li e concordo com os termos e condições' onClick={this.onChecked} />
                 </Form.Field>
-                <Button primary type='submit' disabled={!this.state.checked}>{this.props.client.buttonTextPrimary}</Button>
-                <Button secondary>{this.props.client.buttonTextSecondary}</Button>
+
+                {/*navega para o hub*/}
+                <Button primary disabled={!this.state.checked} onClick={this.handleClick}>{this.props.client.buttonTextPrimary}</Button>
+
+                {/*navega para o hub*/}
+                <Link to='/'><Button secondary>{this.props.client.buttonTextSecondary}</Button></Link>
               </Segment>
             </Form>
           </Grid.Column>

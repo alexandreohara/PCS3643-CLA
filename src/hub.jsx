@@ -4,6 +4,9 @@ import _  from 'lodash'
 import logo from './logo.svg';
 import './App.css';
 import {Search,Button,Accordion,Modal,Icon,Grid,Reveal,List,Segment,Header,Image,Label,Container,Statistic,Item} from 'semantic-ui-react'
+import Link from 'react-router-dom/Link';
+
+const axios = require('axios');
 
 const getResults = () =>
 	{
@@ -138,9 +141,45 @@ class ListaProjetos extends Component{
 	}
 }
 
+const getDemandasCliente = (projetos) => {
+	return projetos.map(projeto => {
+		return({
+			icone: faker.internet.avatar(),
+			projeto: projeto.nome,
+			desc: projeto.desc,
+			empresa: projeto.empresa,
+			prazo: projeto.prazo,
+			valor: projeto.valor
+		})
+	})
+}
+
+const getContratosCliente = (projetos) => {
+	return projetos.map(projeto => {
+		return({
+			icone: faker.internet.avatar(),
+			projeto: projeto.nome,
+			desc: projeto.desc,
+			empresa: projeto.empresa,
+			prazo: projeto.prazo,
+			// integrador: projeto.integrador.nome, // ver o que é
+			valor: projeto.valor,
+		})
+	})
+}
 
 class HubCliente extends  Component{
 	render(){
+		console.log(this.props.cliente)
+		let c = {
+			name: this.props.cliente.nome,
+			desc: this.props.cliente.desc,
+			image: faker.internet.avatar(),
+			price: this.props.cliente.comissao,
+			ofertas: getDemandasCliente(this.props.cliente.cliente.demandas),
+			projetos: getContratosCliente(this.props.cliente.cliente.contratos),
+		}
+
 		const spc = { width: 35, height: 35};
 		const botao = (<Button color='green' icon='tasks' labelPosition='right' content="Monitorar"/>)
 
@@ -150,18 +189,18 @@ class HubCliente extends  Component{
 				<Grid.Column>
 					<div style={spc}></div>
 					<Button circular onClick={this.props.func} color='blue'>
-						<Header as='h1' inverted> <Icon name='plus'/>Crie um projeto!</Header>							
+					<Link to='/new-demand'><Header as='h1' inverted> <Icon name='plus'/>Crie um projeto!</Header></Link>
 					</Button>
 					<div/>
 				
 				</Grid.Column>
 				<Grid.Column>
 					<Header as='h1'> Projetos em aberto:</Header>
-					<ListaProjetos projetos={this.props.perfil.ofertas}/>
+					<ListaProjetos projetos={c.ofertas}/>
 				</Grid.Column>
 				<Grid.Column>
 					<Header as='h1'> Projetos em andamento:</Header>
-					<ListaProjetos projetos={this.props.perfil.projetos} botao={botao}/>	 
+					<ListaProjetos projetos={c.projetos} botao={botao}/>	 
 				</Grid.Column>
 				</Grid.Row>
 				<Grid.Row>	
@@ -179,7 +218,8 @@ class HubIntegrador extends  Component{
 		const spc = { width: 35, height: 35};
 		const botaoOferta =(
 				<div>
-				<Button color='green' icon='thumbs up' labelPosition='right' content="Aceitar"/>
+					{/*navega para o teambuilder*/}
+				<Link to='/team-builder'><Button color='green' icon='thumbs up' labelPosition='right' content="Aceitar"/></Link>
 				<Button color='orange' icon='handshake' labelPosition='right' content="Negociar"/>	
 				</div>
 			);
@@ -246,14 +286,28 @@ class HubPrestador extends  Component{
 	);
 	}
 }
+
 class Hub extends Component{
 	constructor(props){
 		super(props);
 		this.state = {
 			activeIndex: -1,
 			user: getResults(),
+			usuario: null,
 		}
 	}
+
+	userFlag = false;
+
+	getUsuario = () => { // pega o cliente e seus projetos
+		axios.get('https://pcs3643-cla.tk/usuario/ale') // ver se eh esse end-point
+			.then(response => {
+				this.setState({usuario: response.data}); 
+				return response.data})
+			.catch(e => console.log(e))
+			.then(()=> console.log('teste'))
+	}
+
 	handleClick = (e, buttonProps)=>{
 		const index = buttonProps.index;
 		const activeIndex = this.state.activeIndex;
@@ -265,18 +319,23 @@ class Hub extends Component{
 	}
 
 	render(){
+		console.log(this.state.usuario)
+		if (this.userFlag === false) {
+			this.userFlag = true;
+			this.getUsuario();
+		}
 		let page;
 		if(this.state.activeIndex === -1){
 			page =(<HubCentral func={this.handleClick}/>);
 		}
 		else if(this.state.activeIndex === 0){
-			page = (<HubCliente perfil={this.state.user} voltar={this.voltar}/>);
+			page = (<HubCliente perfil={this.state.user} voltar={this.voltar} cliente={this.state.usuario}/>);
 		}
 		else if(this.state.activeIndex === 1){
-			page = (<HubIntegrador perfil={this.state.user} voltar={this.voltar}/>);
+			page = (<HubIntegrador perfil={this.state.user} voltar={this.voltar} integrador={this.state.usuario}/>);
 		}
 		else if(this.state.activeIndex === 2){
-			page = (<HubPrestador perfil={this.state.user} voltar={this.voltar}/>);
+			page = (<HubPrestador perfil={this.state.user} voltar={this.voltar} prestador={this.state.usuario}/>);
 		}
 		return(
 				<div className="App">
