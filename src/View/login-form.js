@@ -25,6 +25,7 @@ export const LoginForm = () => (
               type='password'
             />
             <Button secondary animated>
+            
               <Button.Content visible>Inscrever-se</Button.Content>
               <Button.Content hidden>
                 <Icon name='signup' />
